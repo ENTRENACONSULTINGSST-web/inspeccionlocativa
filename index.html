@@ -589,7 +589,20 @@ tr.innerHTML += `
   tr.innerHTML += `<td style="min-width:150px;">${makeSelect(RESPONSABLES, resp)}</td>`;
 
   // 8: Fecha acción
-  tr.innerHTML += `<td class="editable center" contenteditable="true">${data.fechaAccion || '23 de marzo 2026'}</td>`;
+tr.innerHTML += `
+<td style="min-width:140px;">
+  <input
+    type="date"
+    value="${data.fechaAccion || ''}"
+    style="
+      width:100%;
+      border:none;
+      background:transparent;
+      font:inherit;
+      text-align:center;
+      padding:4px;
+    ">
+</td>`;
 
   // 9: Estado cumplimiento
   const estado = data.estado || 'En proceso';
