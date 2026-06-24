@@ -567,7 +567,7 @@ const accion = data.acciones || '';
 tr.innerHTML += `
 <td style="min-width:280px;">
 
-  ${makeSelect(ACCIONES_GTC45, accion)}
+  ${makeSelect(ACCIONES_GTC45, '')}
 
   <div class="editable"
        contenteditable="true"
@@ -579,6 +579,7 @@ tr.innerHTML += `
           padding:4px;
        "
        id="accionText_${id}">
+       ${accion}
   </div>
 
   <button class="ia-btn"
@@ -591,7 +592,7 @@ tr.innerHTML += `
   </div>
 
 </td>`;
-
+  
 // 7: Responsable
 const resp = data.responsable || '';
 
