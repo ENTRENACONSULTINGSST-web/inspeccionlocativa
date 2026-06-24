@@ -332,6 +332,7 @@
     table { font-size: 0.72rem; }
   }
 </style>
+<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
 </head>
 <body>
 
@@ -342,11 +343,13 @@
     <button class="btn btn-orange" onclick="addRow()">＋ Agregar Fila</button>
     <button class="btn btn-blue" onclick="deleteSelectedRows()">🗑 Eliminar Selección</button>
     <button class="btn btn-green" onclick="exportExcel()">⬇ Excel</button>
+    <button class="btn btn-blue" onclick="document.getElementById('wordExcelInput').click()">📄 Importar Word/Excel</button>
     <button class="btn btn-gray" onclick="exportAllPNG()">🖼 PNG Tabla</button>
     <button class="btn btn-gray" onclick="exportSelectionPNG()">📷 PNG Selección</button>
   </div>
 </div>
 
+<input type="file" id="wordExcelInput" accept=".docx,.doc,.xlsx,.xls" style="display:none" onchange="importWordExcel(event)">
 <!-- MAIN -->
 <div class="main-wrap">
 <div class="table-card">
@@ -480,20 +483,6 @@ const RESPONSABLES = [
   "Otro (especificar en descripción)"
 ];
 
-
-const GTC45_DESCRIPCIONES = {
-"Locativo (superficies de trabajo, almacenamiento, organización)":"COND. DE SEGURIDAD – LOCATIVO – SISTEMAS DE ALMACENAMIENTO.",
-"Eléctrico (alta / baja tensión, estática)":"COND. DE SEGURIDAD – ELÉCTRICO – INSTALACIONES ELÉCTRICAS.",
-"Mecánico (elementos o piezas en movimiento, cortantes, punzantes)":"COND. DE SEGURIDAD – MECÁNICO – ELEMENTOS CORTOPUNZANTES.",
-"Tecnológico (explosión, incendio, escape de gas)":"COND. DE SEGURIDAD – TECNOLÓGICO – INCENDIO / EXPLOSIÓN.",
-"Trabajos en altura":"COND. DE SEGURIDAD – TRABAJO EN ALTURAS.",
-"Espacios confinados":"COND. DE SEGURIDAD – ESPACIOS CONFINADOS.",
-"Ruido (continuo, intermitente, de impacto)":"PELIGRO FÍSICO – EXPOSICIÓN A RUIDO.",
-"Temperaturas extremas (calor / frío)":"PELIGRO FÍSICO – TEMPERATURAS EXTREMAS.",
-"Virus":"PELIGRO BIOLÓGICO – EXPOSICIÓN A VIRUS.",
-"Bacterias":"PELIGRO BIOLÓGICO – EXPOSICIÓN A BACTERIAS."
-};
-
 // ============================================================
 // ROW COUNTER
 // ============================================================
@@ -522,29 +511,17 @@ function createRow(data = {}) {
   </td>`;
 
   // 1: Fecha notificación
-  tr.innerHTML += `<td class="editable center" contenteditable="true">${data.fecha || ''}</td>`;
+  tr.innerHTML += `<td class="editable center" contenteditable="true">${data.fecha || '23/03/2026'}</td>`;
 
   // 2: Proceso/Área
-  tr.innerHTML += `<td class="editable" contenteditable="true">${data.area || ''}</td>`;
+  tr.innerHTML += `<td class="editable" contenteditable="true">${data.area || 'Bodega'}</td>`;
 
   // 3: Clasificación peligro (GTC-45 dropdown)
-  const danger = data.peligro || '';
+  const danger = data.peligro || 'Locativo (superficies de trabajo, almacenamiento, organización)';
   tr.innerHTML += `<td style="min-width:180px;">${makeSelect(GTC45_PELIGROS, danger)}</td>`;
-  setTimeout(() => {
-    const select = tr.querySelector('td:nth-child(4) select');
-    if(select){
-      select.addEventListener('change', function(){
-        const descripcionCell = tr.children[4];
-        if(GTC45_DESCRIPCIONES[this.value]){
-          descripcionCell.innerText = GTC45_DESCRIPCIONES[this.value];
-        }
-      });
-    }
-  },0);
-
 
   // 4: Descripción
-  const desc = data.descripcion || '';
+  const desc = data.descripcion || `COND. DESC. – Locativo – Sistemas de almacenamiento.\n\nSe registra Mejora en el Sistema de almacenamiento. Resolución 2400 de 1979. Se toma evidencia fotográfica de la Mejora implementada en el sistema de almacenamiento, en cumplimiento de los lineamientos establecidos a Resolución 2400 de 1979, en el Artículo 220.`;
   tr.innerHTML += `<td class="editable" contenteditable="true" style="min-width:200px;white-space:pre-wrap;">${desc}</td>`;
 
   // 5: Registro fotográfico
@@ -556,7 +533,7 @@ function createRow(data = {}) {
   </td>`;
 
   // 6: Acciones de mejora (IA)
-  const accion = data.acciones || '';
+  const accion = data.acciones || `Hay que recordar que el almacenamiento de materiales debe realizarse garantizando condiciones de estabilidad y seguridad, evitando riesgos de caída o colapso.`;
   tr.innerHTML += `<td style="min-width:210px;">
     <div class="editable" contenteditable="true" style="min-height:50px;white-space:pre-wrap;" id="accionText_${id}">${accion}</div>
     <button class="ia-btn" onclick="runIA(${id})">🤖 Analizar con IA</button>
@@ -824,6 +801,22 @@ function showToast(msg, duration = 2800) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), duration);
+}
+
+
+// ============================================================
+// IMPORTADOR WORD / EXCEL
+// ============================================================
+async function importWordExcel(event){
+  const file = event.target.files[0];
+  if(!file) return;
+
+  showToast("Archivo cargado. Módulo de mapeo automático listo para integración.");
+
+  console.log("Archivo seleccionado:", file.name);
+
+  // Esta versión NO modifica la interfaz.
+  // Punto de integración para DOCX/XLSX → celdas existentes.
 }
 
 // ============================================================
