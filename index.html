@@ -774,7 +774,7 @@ function exportExcel() {
       cells[4]?.innerText?.trim() || '',
       cells[6]?.querySelector('[contenteditable]')?.innerText?.trim() || '',
       cells[7]?.querySelector('select')?.value || '',
-      cells[8]?.innerText?.trim() || '',
+     cells[8]?.querySelector('input[type="date"]')?.value || '',
       cells[9]?.querySelector('select')?.value || ''
     ]);
   });
