@@ -575,20 +575,26 @@ tr.innerHTML += `
 
   <button class="ia-btn"
           onclick="runIA(${id})">
-          🤖 Analizar con IA
-  </button>
+<button class="ia-btn"
+        onclick="runIA(${id})">
+  🔍 Analizar SST
+</button>
 
-  <div class="ia-output"
-       id="iaOutput_${id}">
-  </div>
+<div class="ia-output"
+     id="iaOutput_${id}">
+</div>
 
 </td>`;
 
-  // 7: Responsable
-  const resp = data.responsable || 'Controles Administrativos';
-  tr.innerHTML += `<td style="min-width:150px;">${makeSelect(RESPONSABLES, resp)}</td>`;
+// 7: Responsable
+const resp = data.responsable || '';
 
-  // 8: Fecha acción
+tr.innerHTML += `
+<td style="min-width:150px;">
+  ${makeSelect(RESPONSABLES, resp)}
+</td>`;
+
+// 8: Fecha acción correctiva
 tr.innerHTML += `
 <td style="min-width:140px;">
   <input
@@ -601,6 +607,7 @@ tr.innerHTML += `
       font:inherit;
       text-align:center;
       padding:4px;
+      box-sizing:border-box;
     ">
 </td>`;
 
