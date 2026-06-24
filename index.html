@@ -678,87 +678,136 @@ function handleFileUpload(event, rowId) {
   });
 }
 
+  // ============================================================
+// MATRIZ SST GTC-45
 // ============================================================
-// IA – Anthropic API
-// ============================================================
-async function runIA(rowId) {
-  const tr = document.querySelector(`tr[data-row-id="${rowId}"]`);
-  const outputEl = document.getElementById(`iaOutput_${rowId}`);
-  const accionEl = document.getElementById(`accionText_${rowId}`);
 
-  // Gather context
-  const cells = tr.querySelectorAll('td');
-  const fecha = cells[1].innerText.trim();
-  const area = cells[2].innerText.trim();
-  const peligroSel = cells[3].querySelector('select');
-  const peligro = peligroSel ? peligroSel.value : '';
-  const descripcion = cells[4].innerText.trim();
-  const accionActual = accionEl.innerText.trim();
-  const estadoSel = cells[9].querySelector('select');
-  const estado = estadoSel ? estadoSel.value : '';
+const MATRIZ_GTC45 = {
 
-  // Check for images in this row
-  const imgs = document.querySelectorAll(`#imgCell_${rowId} .img-thumb`);
-  let imageContent = [];
-  for (const img of imgs) {
-    const src = img.dataset.src || img.src;
-    if (src && src.startsWith('data:image')) {
-      const [meta, b64] = src.split(',');
-      const mtype = meta.replace('data:', '').replace(';base64', '');
-      imageContent.push({ type: "image", source: { type: "base64", media_type: mtype, data: b64 } });
-    }
+  "Aerosoles líquidos (nieblas y rocíos)": {
+    riesgo: "ALTO",
+    prioridad: "ALTA",
+    clasificacion: "Químico",
+    control: "Controles Administrativos",
+    accion: "Etiquetar recipientes según SGA y verificar hojas de seguridad.",
+    plazo: "24 horas",
+    indicador: "100% recipientes identificados."
+  },
+
+  "Locativo (superficies de trabajo, almacenamiento, organización)": {
+    riesgo: "MEDIO",
+    prioridad: "MEDIA",
+    clasificacion: "Locativo",
+    control: "Controles Administrativos",
+    accion: "Corregir condiciones de almacenamiento y orden.",
+    plazo: "30 días",
+    indicador: "100% hallazgos corregidos."
+  },
+
+  "Eléctrico (alta / baja tensión, estática)": {
+    riesgo: "ALTO",
+    prioridad: "ALTA",
+    clasificacion: "Eléctrico",
+    control: "Controles de Ingeniería",
+    accion: "Corregir instalaciones eléctricas inseguras.",
+    plazo: "15 días",
+    indicador: "0 puntos eléctricos expuestos."
+  },
+
+  "Trabajo en alturas": {
+    riesgo: "CRÍTICO",
+    prioridad: "CRÍTICA",
+    clasificacion: "Seguridad",
+    control: "Eliminación",
+    accion: "Suspender actividad hasta implementar controles.",
+    plazo: "Inmediato",
+    indicador: "100% cumplimiento normativo."
   }
 
-  outputEl.innerHTML = '<span class="ia-loading">⏳ Analizando con IA GTC-45...</span>';
+};
+// ============================================================
+// ANALIZADOR SST LOCAL
+// ============================================================
 
-  const userContent = [
-    ...imageContent,
-    {
-      type: "text",
-      text: `Eres un experto en Seguridad y Salud en el Trabajo (SST) especializado en la norma GTC-45 de Colombia.
+function runIA(rowId) {
 
-Analiza el siguiente hallazgo de mejora y genera recomendaciones concretas y prácticas:
+  const tr = document.querySelector(
+    `tr[data-row-id="${rowId}"]`
+  );
 
-- Fecha: ${fecha}
-- Área/Proceso: ${area}
-- Peligro GTC-45: ${peligro}
-- Descripción del hallazgo: ${descripcion}
-- Acción actual registrada: ${accionActual}
-- Estado: ${estado}
-${imageContent.length ? '\n- Se adjunta imagen del hallazgo. Analízala también.' : ''}
+  const outputEl =
+    document.getElementById(
+      `iaOutput_${rowId}`
+    );
 
-Proporciona:
-1. Evaluación del riesgo (nivel: bajo/medio/alto/crítico)
-2. Controles recomendados según jerarquía de la GTC-45 (eliminación, sustitución, controles de ingeniería, controles administrativos, EPP)
-3. Artículo o numeral GTC-45 aplicable
-4. Plazo recomendado de intervención
-5. Indicador de verificación de cumplimiento
+  const cells =
+    tr.querySelectorAll('td');
 
-Responde en máximo 200 palabras, de forma estructurada y directa.`
-    }
-  ];
+  const peligroSel =
+    cells[3].querySelector('select');
 
-  try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        messages: [{ role: "user", content: userContent }]
-      })
-    });
+  const peligro =
+    peligroSel
+      ? peligroSel.value
+      : '';
 
-    const data = await response.json();
-    const text = data.content?.map(b => b.text || '').join('\n') || 'Sin respuesta.';
-    outputEl.innerHTML = '';
-    outputEl.textContent = text;
-    showToast("✅ Análisis IA completado.");
-  } catch (err) {
-    outputEl.innerHTML = `<span style="color:red;">Error IA: ${err.message}</span>`;
+  const descripcion =
+    cells[4].innerText.trim();
+
+  if (!peligro) {
+
+    outputEl.innerHTML =
+      '<span style="color:red;">Seleccione un peligro GTC-45.</span>';
+
+    return;
   }
+
+  let regla =
+    MATRIZ_GTC45[peligro];
+
+  if (!regla) {
+
+    outputEl.innerHTML = `
+      <b>RIESGO:</b> POR EVALUAR<br>
+      <b>OBSERVACIÓN:</b> No existe una regla configurada para este peligro.<br>
+      <b>HALLAZGO:</b> ${descripcion}
+    `;
+
+    return;
+  }
+
+  outputEl.innerHTML = `
+    <div style="text-align:left;font-size:12px;">
+
+      <b>RIESGO:</b> ${regla.riesgo}<br>
+
+      <b>CLASIFICACIÓN:</b>
+      ${regla.clasificacion}<br>
+
+      <b>PRIORIDAD:</b>
+      ${regla.prioridad}<br>
+
+      <b>CONTROL RECOMENDADO:</b>
+      ${regla.control}<br>
+
+      <b>ACCIÓN PROPUESTA:</b>
+      ${regla.accion}<br>
+
+      <b>PLAZO:</b>
+      ${regla.plazo}<br>
+
+      <b>INDICADOR:</b>
+      ${regla.indicador}<br>
+
+      <hr>
+
+      <b>HALLAZGO ANALIZADO:</b><br>
+      ${descripcion}
+
+    </div>
+  `;
+
 }
-
 // ============================================================
 // MODAL
 // ============================================================
