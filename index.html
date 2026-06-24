@@ -510,8 +510,22 @@ function createRow(data = {}) {
     <input type="checkbox" class="row-check" onclick="toggleRowSelect(this)">
   </td>`;
 
-  // 1: Fecha notificación
-  tr.innerHTML += `<td class="editable center" contenteditable="true">${data.fecha || '23/03/2026'}</td>`;
+ // 1: Fecha notificación
+tr.innerHTML += `
+<td style="min-width:140px;">
+  <input
+    type="date"
+    class="date-input"
+    value="${data.fecha || ''}"
+    style="
+      width:100%;
+      border:none;
+      background:transparent;
+      font:inherit;
+      text-align:center;
+      padding:4px;
+    ">
+</td>`;
 
   // 2: Proceso/Área
   tr.innerHTML += `<td class="editable" contenteditable="true">${data.area || 'Bodega'}</td>`;
