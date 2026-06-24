@@ -480,6 +480,20 @@ const RESPONSABLES = [
   "Otro (especificar en descripción)"
 ];
 
+
+const GTC45_DESCRIPCIONES = {
+"Locativo (superficies de trabajo, almacenamiento, organización)":"COND. DE SEGURIDAD – LOCATIVO – SISTEMAS DE ALMACENAMIENTO.",
+"Eléctrico (alta / baja tensión, estática)":"COND. DE SEGURIDAD – ELÉCTRICO – INSTALACIONES ELÉCTRICAS.",
+"Mecánico (elementos o piezas en movimiento, cortantes, punzantes)":"COND. DE SEGURIDAD – MECÁNICO – ELEMENTOS CORTOPUNZANTES.",
+"Tecnológico (explosión, incendio, escape de gas)":"COND. DE SEGURIDAD – TECNOLÓGICO – INCENDIO / EXPLOSIÓN.",
+"Trabajos en altura":"COND. DE SEGURIDAD – TRABAJO EN ALTURAS.",
+"Espacios confinados":"COND. DE SEGURIDAD – ESPACIOS CONFINADOS.",
+"Ruido (continuo, intermitente, de impacto)":"PELIGRO FÍSICO – EXPOSICIÓN A RUIDO.",
+"Temperaturas extremas (calor / frío)":"PELIGRO FÍSICO – TEMPERATURAS EXTREMAS.",
+"Virus":"PELIGRO BIOLÓGICO – EXPOSICIÓN A VIRUS.",
+"Bacterias":"PELIGRO BIOLÓGICO – EXPOSICIÓN A BACTERIAS."
+};
+
 // ============================================================
 // ROW COUNTER
 // ============================================================
@@ -508,17 +522,29 @@ function createRow(data = {}) {
   </td>`;
 
   // 1: Fecha notificación
-  tr.innerHTML += `<td class="editable center" contenteditable="true">${data.fecha || '23/03/2026'}</td>`;
+  tr.innerHTML += `<td class="editable center" contenteditable="true">${data.fecha || ''}</td>`;
 
   // 2: Proceso/Área
-  tr.innerHTML += `<td class="editable" contenteditable="true">${data.area || 'Bodega'}</td>`;
+  tr.innerHTML += `<td class="editable" contenteditable="true">${data.area || ''}</td>`;
 
   // 3: Clasificación peligro (GTC-45 dropdown)
-  const danger = data.peligro || 'Locativo (superficies de trabajo, almacenamiento, organización)';
+  const danger = data.peligro || '';
   tr.innerHTML += `<td style="min-width:180px;">${makeSelect(GTC45_PELIGROS, danger)}</td>`;
+  setTimeout(() => {
+    const select = tr.querySelector('td:nth-child(4) select');
+    if(select){
+      select.addEventListener('change', function(){
+        const descripcionCell = tr.children[4];
+        if(GTC45_DESCRIPCIONES[this.value]){
+          descripcionCell.innerText = GTC45_DESCRIPCIONES[this.value];
+        }
+      });
+    }
+  },0);
+
 
   // 4: Descripción
-  const desc = data.descripcion || `COND. DESC. – Locativo – Sistemas de almacenamiento.\n\nSe registra Mejora en el Sistema de almacenamiento. Resolución 2400 de 1979. Se toma evidencia fotográfica de la Mejora implementada en el sistema de almacenamiento, en cumplimiento de los lineamientos establecidos a Resolución 2400 de 1979, en el Artículo 220.`;
+  const desc = data.descripcion || '';
   tr.innerHTML += `<td class="editable" contenteditable="true" style="min-width:200px;white-space:pre-wrap;">${desc}</td>`;
 
   // 5: Registro fotográfico
@@ -530,7 +556,7 @@ function createRow(data = {}) {
   </td>`;
 
   // 6: Acciones de mejora (IA)
-  const accion = data.acciones || `Hay que recordar que el almacenamiento de materiales debe realizarse garantizando condiciones de estabilidad y seguridad, evitando riesgos de caída o colapso.`;
+  const accion = data.acciones || '';
   tr.innerHTML += `<td style="min-width:210px;">
     <div class="editable" contenteditable="true" style="min-height:50px;white-space:pre-wrap;" id="accionText_${id}">${accion}</div>
     <button class="ia-btn" onclick="runIA(${id})">🤖 Analizar con IA</button>
