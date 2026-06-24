@@ -516,29 +516,66 @@ function createRow(data = {}) {
   // 2: Proceso/Área
   tr.innerHTML += `<td class="editable" contenteditable="true">${data.area || 'Bodega'}</td>`;
 
-  // 3: Clasificación peligro (GTC-45 dropdown)
-  const danger = data.peligro || 'Locativo (superficies de trabajo, almacenamiento, organización)';
-  tr.innerHTML += `<td style="min-width:180px;">${makeSelect(GTC45_PELIGROS, danger)}</td>`;
+// 3: Clasificación peligro (GTC-45 dropdown)
+const danger = data.peligro || '';
 
-  // 4: Descripción
-  const desc = data.descripcion || `COND. DESC. – Locativo – Sistemas de almacenamiento.\n\nSe registra Mejora en el Sistema de almacenamiento. Resolución 2400 de 1979. Se toma evidencia fotográfica de la Mejora implementada en el sistema de almacenamiento, en cumplimiento de los lineamientos establecidos a Resolución 2400 de 1979, en el Artículo 220.`;
-  tr.innerHTML += `<td class="editable" contenteditable="true" style="min-width:200px;white-space:pre-wrap;">${desc}</td>`;
+tr.innerHTML += `
+<td style="min-width:180px;">
+  ${makeSelect(GTC45_PELIGROS, danger)}
+</td>`;
 
-  // 5: Registro fotográfico
-  tr.innerHTML += `<td style="min-width:110px;">
-    <div class="img-cell-wrap" id="imgCell_${id}">
-      <label class="img-upload-btn" for="fileInput_${id}">📎 Adjuntar imagen</label>
-      <input type="file" class="hidden-file" id="fileInput_${id}" accept="image/*,.pdf" multiple onchange="handleFileUpload(event,${id})">
-    </div>
-  </td>`;
+// 4: Descripción
+const desc = data.descripcion || '';
 
-  // 6: Acciones de mejora (IA)
-  const accion = data.acciones || `Hay que recordar que el almacenamiento de materiales debe realizarse garantizando condiciones de estabilidad y seguridad, evitando riesgos de caída o colapso.`;
-  tr.innerHTML += `<td style="min-width:210px;">
-    <div class="editable" contenteditable="true" style="min-height:50px;white-space:pre-wrap;" id="accionText_${id}">${accion}</div>
-    <button class="ia-btn" onclick="runIA(${id})">🤖 Analizar con IA</button>
-    <div class="ia-output" id="iaOutput_${id}"></div>
-  </td>`;
+tr.innerHTML += `
+<td class="editable"
+    contenteditable="true"
+    style="min-width:200px;white-space:pre-wrap;">
+    ${desc}
+</td>`;
+
+// 5: Registro fotográfico
+tr.innerHTML += `
+<td style="min-width:110px;">
+  <div class="img-cell-wrap" id="imgCell_${id}">
+    <label class="img-upload-btn"
+           for="fileInput_${id}">
+           📎 Adjuntar imagen
+    </label>
+
+    <input
+      type="file"
+      class="hidden-file"
+      id="fileInput_${id}"
+      accept="image/*,.pdf"
+      multiple
+      onchange="handleFileUpload(event,${id})">
+  </div>
+</td>`;
+
+// 6: Acciones de mejora (IA opcional)
+const accion = data.acciones || '';
+
+tr.innerHTML += `
+<td style="min-width:210px;">
+
+  <div class="editable"
+       contenteditable="true"
+       style="min-height:50px;white-space:pre-wrap;"
+       id="accionText_${id}">
+       ${accion}
+  </div>
+
+  <button class="ia-btn"
+          onclick="runIA(${id})">
+          🤖 Analizar con IA
+  </button>
+
+  <div class="ia-output"
+       id="iaOutput_${id}">
+  </div>
+
+</td>`;
 
   // 7: Responsable
   const resp = data.responsable || 'Controles Administrativos';
