@@ -560,29 +560,35 @@ tr.innerHTML += `
   </div>
 </td>`;
 
-// 6: Acciones de mejora (IA opcional)
+// 6: Acciones de mejora (Jerarquía de controles GTC-45)
+
 const accion = data.acciones || '';
 
 tr.innerHTML += `
-<td style="min-width:210px;">
+<td style="min-width:280px;">
+
+  ${makeSelect(ACCIONES_GTC45, accion)}
 
   <div class="editable"
        contenteditable="true"
-       style="min-height:50px;white-space:pre-wrap;"
+       style="
+          margin-top:6px;
+          min-height:50px;
+          white-space:pre-wrap;
+          border:1px solid #ddd;
+          padding:4px;
+       "
        id="accionText_${id}">
-       ${accion}
   </div>
 
   <button class="ia-btn"
           onclick="runIA(${id})">
-<button class="ia-btn"
-        onclick="runIA(${id})">
-  🔍 Analizar SST
-</button>
+      🔍 Analizar SST
+  </button>
 
-<div class="ia-output"
-     id="iaOutput_${id}">
-</div>
+  <div class="ia-output"
+       id="iaOutput_${id}">
+  </div>
 
 </td>`;
 
